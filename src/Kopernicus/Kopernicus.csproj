@@ -1,5 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\packages\KSPBuildTools.0.0.2-alpha.7\build\KSPBuildTools.props" Condition="Exists('..\..\packages\KSPBuildTools.0.0.2-alpha.7\build\KSPBuildTools.props')" />
+  <Import Project="..\..\packages\JsonPoke.1.2.0\build\JsonPoke.props" Condition="Exists('..\..\packages\JsonPoke.1.2.0\build\JsonPoke.props')" />
   <Import Project="..\..\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.props" Condition="Exists('..\..\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -9,7 +11,6 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Kopernicus</RootNamespace>
     <AssemblyName>Kopernicus</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <PlatformTarget>x64</PlatformTarget>
     <LangVersion>7.3</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -17,88 +18,32 @@
     <WarningLevel>4</WarningLevel>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE;ENABLE_PROFILER</DefineConstants>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ReleaseKSP19Plus|x64' ">
-    <OutputPath>bin\Release19\</OutputPath>
-    <Optimize>true</Optimize>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseKSP18|x64'">
-    <OutputPath>bin\Release18\</OutputPath>
-    <DefineConstants>KSP_VERSION_1_8</DefineConstants>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <OutputPath>bin\Release\</OutputPath>
     <Optimize>true</Optimize>
   </PropertyGroup>
   <!--Import targets now, which will import Kopernicus.csproj.user where the path to the KSP install root must be defined in ReferencePath-->
   <!--This must be done after the main project poperties are defined because it needs the target framework property to be defined -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!--Parse KSP platform-specific paths and set the start action-->
-  <PropertyGroup>
-    <KSPExecutable Condition="$([MSBuild]::IsOsPlatform('Windows'))">KSP_x64.exe</KSPExecutable>
-    <KSPExecutable Condition="$([MSBuild]::IsOsPlatform('OSX'))">KSP.app</KSPExecutable>
-    <KSPExecutable Condition="$([MSBuild]::IsOsPlatform('Linux'))">KSP.x86_64</KSPExecutable>
-    <ManagedRelativePath Condition="$([MSBuild]::IsOsPlatform('Windows'))">KSP_x64_Data\Managed</ManagedRelativePath>
-    <ManagedRelativePath Condition="$([MSBuild]::IsOsPlatform('OSX'))">KSP.app\Contents\Resources\Data\Managed</ManagedRelativePath>
-    <ManagedRelativePath Condition="$([MSBuild]::IsOsPlatform('Linux'))">KSP_Data\Managed</ManagedRelativePath>
-    <ManagedPath>$(ReferencePath)\$(ManagedRelativePath)</ManagedPath>
-    <StartAction>Program</StartAction>
-    <StartProgram>$(ReferencePath)\$(KSPExecutable)</StartProgram>
-    <StartWorkingDirectory>$(ReferencePath)</StartWorkingDirectory>
-  </PropertyGroup>
-  <!--Import references-->
   <ItemGroup>
-    <Reference Include="$(ManagedPath)\System.dll">
-      <Name>System (KSP/Mono)</Name>
-      <Private>False</Private>
+    <Reference Include="ModularFlightIntegrator">
+      <HintPath>$(KSPRoot)/GameData/ModularFlightIntegrator/ModularFlightIntegrator.dll</HintPath>
+      <CKANIdentifier>ModularFlightIntegrator</CKANIdentifier>
+      <Private>false</Private>
     </Reference>
-    <Reference Include="$(ManagedPath)\mscorlib.dll">
-      <Name>System.Core (KSP/Mono)</Name>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="$(ManagedPath)\System.Xml.dll">
-      <Name>System.Xml (KSP/Mono)</Name>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="$(ManagedPath)\UnityEngine*.dll">
-      <Name>UnityEngine</Name>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="$(ManagedPath)\Assembly-CSharp.dll">
-      <Name>Assembly-CSharp</Name>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="..\..\dependencies\Kopernicus.Parser.dll">
-      <Name>Kopernicus.Parser</Name>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="0Harmony, Version=2.2.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Lib.Harmony.2.2.2\lib\net48\0Harmony.dll</HintPath>
-    </Reference>
+      <Reference Include="0Harmony">
+        <HintPath>$(KSPRoot)/GameData/000_Harmony/0Harmony.dll</HintPath>
+        <CKANIdentifier>Harmony2</CKANIdentifier>
+        <Private>false</Private>
+      </Reference>
   </ItemGroup>
-  <Choose>
-    <When Condition="'$(Configuration)' == 'ReleaseKSP18'">
-      <ItemGroup>
-        <Reference Include="..\..\dependencies\MFI_1.2.7_KSP1.8\ModularFlightIntegrator.dll">
-          <Name>ModularFlightIntegrator</Name>
-          <Private>False</Private>
-        </Reference>
-      </ItemGroup>
-    </When>
-    <Otherwise>
-      <ItemGroup>
-        <Reference Include="..\..\dependencies\MFI_latest\ModularFlightIntegrator.dll">
-          <Name>ModularFlightIntegrator</Name>
-          <Private>False</Private>
-        </Reference>
-      </ItemGroup>
-    </Otherwise>
-  </Choose>
   <!--Krafs.Publicizer items-->
   <ItemGroup>
     <Publicize Include="UnityEngine.CoreModule:UnityEngine.Object.m_CachedPtr" />
@@ -446,24 +391,24 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <!--Copy to build folder and to the local KSP install on build-->
-  <Target Name="AfterBuild">
-    <ItemGroup>
-      <BuildFiles Include="$(OutputPath)Kopernicus.dll" />
-      <BuildFiles Include="$(OutputPath)Kopernicus.Parser.dll" />
-      <BuildFiles Condition="Exists('$(OutputPath)Kopernicus.pdb')" Include="$(OutputPath)Kopernicus.pdb" />
-    </ItemGroup>
-    <Copy Condition="'$(Configuration)' == 'ReleaseKSP19Plus'" SourceFiles="@(BuildFiles)" DestinationFolder="$(ProjectDir)..\..\build\KSP19PLUS\GameData\Kopernicus\Plugins" />
-    <Copy Condition="'$(Configuration)' == 'ReleaseKSP18'" SourceFiles="@(BuildFiles)" DestinationFolder="$(ProjectDir)..\..\build\KSP18\GameData\Kopernicus\Plugins" />
-    <Error Condition="'$(ReferencePath)' == '' OR !Exists('$(ReferencePath)')" Text="ReferencePath=$(ReferencePath) is empty or isn't a valid path" />
-    <Copy SourceFiles="@(BuildFiles)" DestinationFolder="$(ReferencePath)\GameData\Kopernicus\Plugins" />
-  </Target>
+  <ItemGroup>
+    <ProjectReference Include="..\external\config-parser\src\Kopernicus.Parser.csproj">
+      <Project>{f9968d87-83da-453c-8e28-b632367eacd3}</Project>
+      <Name>Kopernicus.Parser</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.props'))" />
     <Error Condition="!Exists('..\..\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.targets'))" />
+    <Error Condition="!Exists('..\..\packages\JsonPoke.1.2.0\build\JsonPoke.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\JsonPoke.1.2.0\build\JsonPoke.props'))" />
+    <Error Condition="!Exists('..\..\packages\JsonPoke.1.2.0\build\JsonPoke.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\JsonPoke.1.2.0\build\JsonPoke.targets'))" />
+    <Error Condition="!Exists('..\..\packages\KSPBuildTools.0.0.2-alpha.7\build\KSPBuildTools.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\KSPBuildTools.0.0.2-alpha.7\build\KSPBuildTools.props'))" />
+    <Error Condition="!Exists('..\..\packages\KSPBuildTools.0.0.2-alpha.7\build\KSPBuildTools.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\KSPBuildTools.0.0.2-alpha.7\build\KSPBuildTools.targets'))" />
   </Target>
   <Import Project="..\..\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.targets" Condition="Exists('..\..\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.targets')" />
+  <Import Project="..\..\packages\JsonPoke.1.2.0\build\JsonPoke.targets" Condition="Exists('..\..\packages\JsonPoke.1.2.0\build\JsonPoke.targets')" />
+  <Import Project="..\..\packages\KSPBuildTools.0.0.2-alpha.7\build\KSPBuildTools.targets" Condition="Exists('..\..\packages\KSPBuildTools.0.0.2-alpha.7\build\KSPBuildTools.targets')" />
 </Project>
